@@ -1,0 +1,64 @@
+<%- include('partials/header', { titolo: 'Ricerca Tipologiche' }) %>
+
+<div class="container mt-5">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="mb-4">Ricerca Tipologiche</h3>
+
+      <!-- ✅ Messaggi da URL parameters (per successo/errore da redirect) -->
+      <% if (req && req.query.errore) { %>
+        <div class="alert alert-danger"><%= req.query.errore %></div>
+      <% } %>
+
+      <% if (req && req.query.successo) { %>
+        <div class="alert alert-success"><%= req.query.successo %></div>
+      <% } %>
+
+      <!-- ✅ Messaggi dal controller (per ricerca) -->
+      <% if (errore) { %>
+        <div class="alert alert-danger"><%= errore %></div>
+      <% } %>
+
+      <% if (successo) { %>
+        <div class="alert alert-success"><%= successo %></div>
+      <% } %>
+
+      <form action="/tipologiche/ricerca" method="GET" class="mb-4">
+        <div class="input-group">
+          <input type="text" name="descrizione" class="form-control" placeholder="Inserisci descrizione da cercare..." value="<%= req && req.query.descrizione ? req.query.descrizione : '' %>">
+          <button type="submit" class="btn btn-primary">Cerca</button>
+        </div>
+      </form>
+
+      <% if (tipologiche && tipologiche.length > 0) { %>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Descrizione</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% tipologiche.forEach(t => { %>
+              <tr>
+                <td><%= t.id_tipologica %></td>
+                <td><%= t.descrizione %></td>
+                <td>
+                  <a href="/tipologiche/<%= t.id_tipologica %>/modifica" class="btn btn-sm btn-warning">Modifica</a>
+                  <form action="/tipologiche/<%= t.id_tipologica %>/elimina" method="POST" class="d-inline" onsubmit="return confirm('Sei sicuro di voler eliminare questa tipologica?');">
+                    <button type="submit" class="btn btn-sm btn-danger">Elimina</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } else if (tipologiche) { %>
+        <p class="text-muted">Nessun risultato trovato.</p>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

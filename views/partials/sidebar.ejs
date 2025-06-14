@@ -1,0 +1,161 @@
+<style>
+:root {
+  --primary-color: #2c5530;
+  --secondary-color: #4a7c59;
+  --accent-color: #8fbc8f;
+  --dark-green: #1a3f1d;
+  --light-green: #e8f5e8;
+  --orange-accent: #ff6b35;
+  --gradient-bg: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
+}
+
+.modern-sidebar {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+  border: 1px solid rgba(44, 85, 48, 0.1);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+  max-width: 100%;
+  backdrop-filter: blur(10px);
+  overflow-x: hidden;
+  animation: slideInLeft 0.5s ease-out;
+}
+
+.sidebar-link, .sidebar-sublink {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  color: var(--dark-green);
+  text-decoration: none;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+}
+
+.sidebar-link:hover, .sidebar-sublink:hover {
+  background: var(--light-green);
+  color: var(--primary-color);
+  transform: translateX(5px);
+}
+
+.sidebar-link.active, .sidebar-sublink.active {
+  background: var(--gradient-bg);
+  color: white;
+}
+
+.btn-quick {
+  background: var(--gradient-bg);
+  color: white;
+  border-radius: 20px;
+  padding: 8px 16px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+}
+
+.btn-quick:hover {
+  background: linear-gradient(135deg, #4a7c59, #2c5530);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(44, 85, 48, 0.3);
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+</style>
+
+<div class="modern-sidebar p-4">
+  <div class="search-section mb-4">
+    <div class="search-container position-relative">
+      <i class="bi bi-search search-icon position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+      <input type="text" class="form-control modern-search ps-5" placeholder="Cerca in tutto..." />
+    </div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-title text-uppercase fw-bold mb-3">
+      <i class="bi bi-list me-2"></i>Menu Principale
+    </div>
+
+    <a href="/home" class="sidebar-link mb-2">
+      <i class="bi bi-house-door sidebar-icon me-2"></i>
+      <span>Home Page</span>
+    </a>
+
+    <!-- Accordion con sezioni -->
+    <div class="accordion modern-accordion" id="sidebarAccordion">
+      <!-- Clienti -->
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed modern-accordion-btn" type="button" data-bs-toggle="collapse" data-bs-target="#clientiCollapse">
+            <i class="bi bi-people me-2"></i>Gestione Clienti
+          </button>
+        </h2>
+        <div id="clientiCollapse" class="accordion-collapse collapse" data-bs-parent="#sidebarAccordion">
+          <div class="accordion-body">
+            <a href="/clienti/nuovo" class="sidebar-sublink"><i class="bi bi-person-plus me-2"></i>Nuovo Cliente</a>
+            <a href="/clienti/form" class="sidebar-sublink"><i class="bi bi-person-gear me-2"></i>Modifica Cliente</a>
+            <a href="/clienti/lista" class="sidebar-sublink"><i class="bi bi-people-fill me-2"></i>Lista Clienti</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Eventi -->
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed modern-accordion-btn" type="button" data-bs-toggle="collapse" data-bs-target="#eventiCollapse">
+            <i class="bi bi-calendar-event me-2"></i>Eventi
+          </button>
+        </h2>
+        <div id="eventiCollapse" class="accordion-collapse collapse" data-bs-parent="#sidebarAccordion">
+          <div class="accordion-body">
+            <a href="/eventi/nuovo" class="sidebar-sublink"><i class="bi bi-calendar-plus me-2"></i>Nuovo Evento</a>
+            <a href="/eventi/ricerca" class="sidebar-sublink"><i class="bi bi-calendar-check me-2"></i>Gestisci Eventi</a>
+            <a href="/iscrizioni/" class="sidebar-sublink highlight"><i class="bi bi-person-check me-2"></i>Iscrivi Cliente</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tipologiche -->
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed modern-accordion-btn" type="button" data-bs-toggle="collapse" data-bs-target="#tipologicheCollapse">
+            <i class="bi bi-gear me-2"></i>Tipologiche
+          </button>
+        </h2>
+        <div id="tipologicheCollapse" class="accordion-collapse collapse" data-bs-parent="#sidebarAccordion">
+          <div class="accordion-body">
+            <a href="/tipologiche/nuovo" class="sidebar-sublink"><i class="bi bi-plus-square me-2"></i>Inserimento</a>
+            <a href="/tipologiche/ricerca" class="sidebar-sublink"><i class="bi bi-pencil-square me-2"></i>Modifica</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Azioni rapide -->
+    <div class="quick-actions mt-4">
+      <div class="menu-title text-uppercase fw-bold mb-3">
+        <i class="bi bi-lightning me-2"></i>Azioni Rapide
+      </div>
+      <div class="quick-action-buttons d-flex flex-column gap-2">
+        <a href="/clienti/nuovo" class="btn btn-quick btn-sm"><i class="bi bi-person-plus me-1"></i>Aggiungi Cliente</a>
+        <a href="/prodotti/nuovo" class="btn btn-quick btn-sm"><i class="bi bi-bicycle me-1"></i>Aggiungi Prodotto</a>
+        <a href="/eventi/nuovo" class="btn btn-quick btn-sm"><i class="bi bi-calendar-plus me-1"></i>Crea Evento</a>
+        <a href="/iscrizioni" class="btn btn-quick btn-sm"><i class="bi bi-check2-circle me-1"></i>Aggiungi Cliente ad Evento</a>
+      </div>
+    </div>
+  </div>
+</div>

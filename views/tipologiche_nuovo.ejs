@@ -1,0 +1,32 @@
+<%- include('partials/header', { titolo: 'Nuova Tipologica' }) %>
+
+<div class="container mt-5">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="mb-4">Inserisci una nuova Tipologica</h3>
+
+      <% if (errore) { %>
+        <div class="alert alert-danger"><%= errore %></div>
+      <% } %>
+
+      <% if (successo) { %>
+        <div class="alert alert-success"><%= successo %></div>
+      <% } %>
+
+      <form action="/tipologiche/nuovo" method="POST">
+        <div class="mb-3">
+          <label for="descrizione" class="form-label">Descrizione Evento *</label>
+          <input type="text" name="descrizione" id="descrizione" class="form-control" required>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <a href="/home" class="btn btn-secondary">Annulla</a>
+          <button type="submit" class="btn btn-primary">Salva</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
+

@@ -1,0 +1,38 @@
+<%- include('../partials/header', { titolo: 'Risultati Ricerca Eventi' }) %>
+
+<div class="container mt-5">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="mb-4">Risultati Ricerca Eventi</h3>
+
+      <% if (eventi.length === 0) { %>
+        <p class="text-muted">Nessun evento trovato.</p>
+      <% } else { %>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Titolo</th>
+              <th>Categoria</th>
+              <th>Data Inizio</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% eventi.forEach(e => { %>
+              <tr>
+                <td><%= e.titolo %></td>
+                <td><%= e.categoria_descrizione %></td>
+                <td><%= e.data_inizio %></td>
+                <td>
+                  <a href="/eventi/<%= e.id_evento %>/modifica" class="btn btn-warning btn-sm">Modifica</a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,98 @@
+<%- include('partials/header') %>
+
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex align-items-center mb-4">
+        <img src="/img/logo.png" alt="Logo" class="logo me-3">
+        <h2 class="mb-0">Aggiungi Nuovo Cliente</h2>
+      </div>
+
+      <% if (errore) { %>
+        <div class="alert alert-danger"><%= errore %></div>
+      <% } %>
+
+      <% if (successo) { %>
+        <div class="alert alert-success"><%= successo %></div>
+      <% } %>
+
+      <form action="/clienti/nuovo" method="POST" novalidate>
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Nome *</label>
+            <input type="text" name="nome" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Cognome / Ragione Sociale *</label>
+            <input type="text" name="cognome_rag_soc" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Luogo di nascita</label>
+            <input type="text" name="luogo_nascita" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Data di nascita *</label>
+            <input type="date" name="data_nascita" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Data iscrizione *</label>
+            <input type="date" name="data_iscrizione" class="form-control" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Data scadenza *</label>
+            <input type="date" name="data_scadenza" class="form-control" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Cellulare</label>
+            <input type="text" name="cellulare" class="form-control">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Indirizzo</label>
+          <input type="text" name="indirizzo" class="form-control">
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Città</label>
+            <input type="text" name="citta" class="form-control">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Provincia</label>
+            <input type="text" name="provincia" class="form-control">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">CAP</label>
+            <input type="text" name="cap" class="form-control">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Codice Fiscale / Partita IVA</label>
+          <input type="text" name="cf_piva" class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Email *</label>
+          <input type="email" name="email" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Note</label>
+          <textarea name="note" class="form-control" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salva Cliente</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

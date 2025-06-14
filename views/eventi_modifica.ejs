@@ -1,0 +1,98 @@
+
+<%- include('partials/header', { titolo: 'Modifica Evento' }) %>
+
+<div class="container mt-5">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex align-items-center mb-4">
+        <img src="/img/logo.png" alt="Logo" class="logo me-3">
+        <h3 class="mb-0">Modifica Evento</h3>
+      </div>
+
+      <% if (successo) { %>
+        <div class="alert alert-success"><%= successo %></div>
+      <% } %>
+
+      <% if (errore) { %>
+        <div class="alert alert-danger"><%= errore %></div>
+      <% } %>
+
+      <form action="/eventi/<%= evento.id_evento %>/modifica" method="POST">
+        <div class="mb-3">
+          <label class="form-label">Titolo</label>
+          <input type="text" name="titolo" value="<%= evento.titolo %>" required class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Categoria</label>
+          <select name="categoria" class="form-select" required>
+            <% if (tipologiche && tipologiche.length > 0) { %>
+              <% tipologiche.forEach(t => { %>
+                <option value="<%= t.id_tipologica %>" 
+                        <%= t.id_tipologica == evento.categoria ? 'selected' : '' %>>
+                  <%= t.descrizione %>
+                </option>
+              <% }) %>
+            <% } %>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Data Inizio</label>
+            <input type="date" name="data_inizio" 
+                   value="<%= evento.data_inizio %>" 
+                   required class="form-control">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Data Fine</label>
+            <input type="date" name="data_fine" 
+                   value="<%= evento.data_fine %>" 
+                   required class="form-control">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Orario Inizio</label>
+            <input type="time" name="orario_inizio" 
+                   value="<%= evento.orario_inizio || '' %>" 
+                   class="form-control">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Orario Fine</label>
+            <input type="time" name="orario_fine" 
+                   value="<%= evento.orario_fine || '' %>" 
+                   class="form-control">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Luogo</label>
+          <input type="text" name="luogo" 
+                 value="<%= evento.luogo || '' %>" 
+                 class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Note</label>
+          <textarea name="note" class="form-control" rows="3"><%= evento.note || '' %></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Prezzo</label>
+          <input type="number" name="prezzo" 
+                 value="<%= evento.prezzo || '' %>" 
+                 step="0.01" class="form-control">
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <a href="/eventi/ricerca" class="btn btn-secondary">Annulla</a>
+          <button type="submit" class="btn btn-success">Salva Modifiche</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

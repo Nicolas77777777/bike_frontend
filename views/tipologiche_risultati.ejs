@@ -1,0 +1,53 @@
+<%- include('../partials/header', { titolo: 'Risultati Ricerca Tipologiche' }) %>
+
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+
+      <!-- Titolo sezione -->
+      <div class="d-flex align-items-center mb-4">
+        <img src="/img/logo.png" alt="Logo" class="logo me-3" style="width: 50px; height: 50px;">
+        <h2 class="mb-0">Risultati Ricerca Tipologiche</h2>
+      </div>
+
+      <!-- Messaggi -->
+      <% if (errore) { %>
+        <div class="alert alert-danger"><%= errore %></div>
+      <% } %>
+
+      <% if (successo) { %>
+        <div class="alert alert-success"><%= successo %></div>
+      <% } %>
+
+      <!-- Tabella risultati -->
+      <% if (tipologiche.length === 0) { %>
+        <p class="text-muted">Nessuna tipologica trovata.</p>
+      <% } else { %>
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Descrizione</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% tipologiche.forEach(t => { %>
+              <tr>
+                <td><%= t.descrizione %></td>
+                <td>
+                  <a href="/tipologiche/<%= t.id_tipologica %>/modifica" class="btn btn-sm btn-warning">Modifica</a>
+                  <form action="/tipologiche/<%= t.id_tipologica %>/elimina" method="POST" class="d-inline" onsubmit="return confirm('Sei sicuro di voler eliminare questa tipologica?');">
+                    <button type="submit" class="btn btn-sm btn-danger">Elimina</button>
+                  </form>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

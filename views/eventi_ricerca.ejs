@@ -1,0 +1,88 @@
+
+<%- include('partials/header') %>
+
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex align-items-center mb-3">
+        <img src="/img/logo.png" alt="Logo" class="logo me-3">
+        <div>
+          <h2 class="mb-0">Ricerca Evento</h2>
+          <small class="text-muted">Compila uno o più campi per avviare la ricerca</small>
+        </div>
+      </div>
+
+      <% if (errore) { %>
+        <div class="alert alert-danger"><%= errore %></div>
+      <% } %>
+      <% if (successo) { %>
+        <div class="alert alert-success"><%= successo %></div>
+      <% } %>
+
+      <form method="get" action="/eventi/ricerca">
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Titolo</label>
+            <input type="text" name="titolo" class="form-control" value="<%= req.query.titolo || '' %>">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Categoria</label>
+            <select name="categoria" class="form-select">
+              <option value="">-- Seleziona --</option>
+              <% if (tipologiche && tipologiche.length > 0) {
+                tipologiche.forEach(t => { %>
+                <option value="<%= t.id_tipologica %>" <%= req.query.categoria == t.id_tipologica ? 'selected' : '' %>>
+                  <%= t.descrizione %>
+                </option>
+              <% }) } %>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Data Inizio</label>
+            <input type="date" name="data_inizio" class="form-control" value="<%= req.query.data_inizio || '' %>">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">Data Fine</label>
+            <input type="date" name="data_fine" class="form-control" value="<%= req.query.data_fine || '' %>">
+          </div>
+        </div>
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-primary">Cerca</button>
+        </div>
+      </form>
+
+      <% if (eventi && eventi.length > 0) { %>
+        <hr>
+        <table class="table table-bordered table-hover mt-3">
+          <thead>
+            <tr>
+              <th>Titolo</th>
+              <th>Categoria</th>
+              <th>Data inizio</th>
+              <th>Data fine</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% eventi.forEach(evento => { %>
+              <tr>
+                <td><%= evento.titolo %></td>
+                <td><%= evento.categoria_descrizione %></td>
+                <td><%= evento.data_inizio.split('T')[0] %></td>
+                <td><%= evento.data_fine.split('T')[0] %></td>
+                <td>
+                  <a href="/eventi/<%= evento.id_evento %>/modifica" class="btn btn-sm btn-warning">Modifica</a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } else if (eventi) { %>
+        <p class="mt-3">Nessun evento trovato.</p>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,99 @@
+
+<%- include('partials/header', { titolo: 'Iscritti all\'Evento' }) %>
+
+<div class="container py-4">
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h3 class="mb-3">Iscritti all’evento: <%= evento.titolo %></h3>
+
+      <% if (successo) { %>
+        <div class="alert alert-success"><%= successo %></div>
+      <% } %>
+
+      <% if (errore) { %>
+        <div class="alert alert-danger"><%= errore %></div>
+      <% } %>
+
+      <div id="messaggio-export"></div>
+      <div id="spinner" class="text-center my-2" style="display: none;">
+        <div class="spinner-border text-success" role="status">
+          <span class="visually-hidden">Caricamento...</span>
+        </div>
+      </div>
+
+      <button id="btnExport" class="btn btn-outline-success mb-3">
+        <i class="bi bi-file-earmark-excel"></i> Esporta Excel
+      </button>
+
+      <form method="GET" action="/iscrizioni/evento/<%= evento.id_evento %>/export-pdf" target="_blank"
+  onsubmit="setTimeout(() => window.location.href = '/iscrizioni/evento/<%= evento.id_evento %>/iscritti', 1000);">
+  <button type="submit" class="btn btn-outline-danger mb-3 ms-2">
+    <i class="bi bi-filetype-pdf"></i> Esporta PDF
+  </button>
+</form>
+
+
+      <script>
+        document.getElementById('btnExport').addEventListener('click', async () => {
+          const idEvento = "<%= evento.id_evento %>";
+          const messaggioDiv = document.getElementById("messaggio-export");
+          const spinner = document.getElementById("spinner");
+          spinner.style.display = 'block';
+          messaggioDiv.innerHTML = '';
+
+          try {
+            const res = await fetch(`http://localhost:3000/iscrizioni/evento/${idEvento}/export`);
+            spinner.style.display = 'none';
+
+            if (res.ok) {
+              messaggioDiv.innerHTML = `
+                <div class="alert alert-success mt-3">
+                  ✅ File Excel generato con successo.
+                  <a href="http://localhost:3000/download/iscritti_evento_${idEvento}.xlsx" class="btn btn-sm btn-primary" download>Scarica ora</a>
+                </div>
+              `;
+            } else {
+              messaggioDiv.innerHTML = '<div class="alert alert-danger mt-3">❌ Errore durante la generazione del file</div>';
+            }
+          } catch (error) {
+            spinner.style.display = 'none';
+            messaggioDiv.innerHTML = '<div class="alert alert-danger mt-3">❌ Errore di rete o server</div>';
+          }
+        });
+      </script>
+
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Cognome / Rag. Soc.</th>
+            <th>Email</th>
+            <th>Telefono</th>
+            <th>Codice Fiscale / P.IVA</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% iscritti.forEach(i => { %>
+            <tr>
+              <td><%= i.nome %></td>
+              <td><%= i.cognome_rag_soc %></td>
+              <td><%= i.email %></td>
+              <td><%= i.cellulare %></td>
+              <td><%= i.cf_piva %></td>
+              <td>
+                <form method="POST" action="/iscrizioni/rimuovi">
+                  <input type="hidden" name="id_cliente" value="<%= i.id_cliente %>">
+                  <input type="hidden" name="id_evento" value="<%= evento.id_evento %>">
+                  <button type="submit" class="btn btn-sm btn-danger">Rimuovi</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

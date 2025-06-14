@@ -1,0 +1,177 @@
+<nav class="navbar navbar-expand-lg navbar-dark modern-navbar">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="/home">
+      <div class="logo-container me-3">
+        <img src="/img/logo.png" alt="Logo" width="40" height="40">
+      </div>
+      <span><i class="bi bi-bicycle me-2"></i>Bike and Hike</span>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav ms-auto">
+
+        <!-- Home -->
+        <li class="nav-item">
+          <a class="nav-link" href="/home">
+            <i class="bi bi-house-door me-1"></i>Home
+          </a>
+        </li>
+
+        <!-- Clienti -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarClienti" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-people me-1"></i>Clienti
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarClienti">
+            <li>
+              <a class="dropdown-item" href="/clienti/nuovo">
+                <i class="bi bi-person-plus me-2"></i>Nuovo Cliente
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/clienti/form">
+                <i class="bi bi-person-gear me-2"></i>Modifica Cliente
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/clienti/lista">
+                <i class="bi bi-people-fill me-2"></i>Lista Clienti
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Prodotti -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarProdotti" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-bicycle me-1"></i>Prodotti
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarProdotti">
+            <li>
+              <a class="dropdown-item" href="/prodotti/nuovo">
+                <i class="bi bi-plus-circle me-2"></i>Nuovo Prodotto
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/prodotti/lista">
+                <i class="bi bi-list-ul me-2"></i>Lista Prodotti
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Tipologiche -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarTipologiche" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-gear me-1"></i>Tipologiche
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarTipologiche">
+            <li>
+              <a class="dropdown-item" href="/tipologiche/nuovo">
+                <i class="bi bi-plus-square me-2"></i>Inserisci Tipologica
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/tipologiche/ricerca">
+                <i class="bi bi-search me-2"></i>Ricerca / Modifica
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- Eventi -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarEventi" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-calendar-event me-1"></i>Eventi
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarEventi">
+            <li>
+              <a class="dropdown-item" href="/eventi/nuovo">
+                <i class="bi bi-calendar-plus me-2"></i>Inserisci Evento
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/eventi/ricerca">
+                <i class="bi bi-calendar-check me-2"></i>Ricerca / Modifica
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" href="/iscrizioni/">
+                <i class="bi bi-person-check me-2"></i>Iscrivi Cliente a Evento
+              </a>
+            </li>
+          </ul>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<style>
+  /* Stili aggiuntivi per la navbar completa */
+  .dropdown-divider {
+    border-color: var(--light-green);
+    margin: 0.5rem 1rem;
+  }
+
+  .dropdown-menu {
+    min-width: 250px;
+  }
+
+  .dropdown-item {
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .dropdown-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: var(--orange-accent);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
+
+  .dropdown-item:hover::before {
+    transform: scaleY(1);
+  }
+
+  /* Responsive dropdown */
+  @media (max-width: 991px) {
+    .dropdown-menu {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(44, 85, 48, 0.1);
+      margin-left: 1rem;
+      margin-top: 0.5rem;
+    }
+    
+    .navbar-nav .dropdown-menu {
+      position: static;
+      float: none;
+      width: auto;
+      margin-top: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      border: none;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-nav .dropdown-item {
+      color: white;
+    }
+    
+    .navbar-nav .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--accent-color);
+    }
+  }
+</style>

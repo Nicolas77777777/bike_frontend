@@ -1,0 +1,79 @@
+<%- include('partials/header', { titolo: 'Nuovo Evento' }) %>
+
+<div class="container mt-5">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="mb-4">Inserisci Nuovo Evento</h3>
+
+      <% if (errore) { %>
+        <div class="alert alert-danger"><%= errore %></div>
+      <% } %>
+      <% if (successo) { %>
+        <div class="alert alert-success"><%= successo %></div>
+      <% } %>
+
+      <form action="/eventi/nuovo" method="POST">
+        <div class="mb-3">
+          <label for="titolo" class="form-label">Titolo Evento *</label>
+          <input type="text" class="form-control" id="titolo" name="titolo" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="categoria" class="form-label">Categoria *</label>
+          <select class="form-select" id="categoria" name="categoria" required>
+            <option value="">Seleziona categoria...</option>
+            <% if (tipologiche && tipologiche.length > 0) { %>
+              <% tipologiche.forEach(t => { %>
+                <option value="<%= t.id_tipologica %>"><%= t.descrizione %></option>
+              <% }) %>
+            <% } %>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="data_inizio" class="form-label">Data Inizio *</label>
+            <input type="date" class="form-control" id="data_inizio" name="data_inizio" required>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="data_fine" class="form-label">Data Fine *</label>
+            <input type="date" class="form-control" id="data_fine" name="data_fine" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="orario_inizio" class="form-label">Orario Inizio</label>
+            <input type="time" class="form-control" id="orario_inizio" name="orario_inizio">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="orario_fine" class="form-label">Orario Fine</label>
+            <input type="time" class="form-control" id="orario_fine" name="orario_fine">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="luogo" class="form-label">Luogo</label>
+          <input type="text" class="form-control" id="luogo" name="luogo">
+        </div>
+
+        <div class="mb-3">
+          <label for="prezzo" class="form-label">Prezzo (facoltativo)</label>
+          <input type="number" step="0.01" class="form-control" id="prezzo" name="prezzo">
+        </div>
+
+        <div class="mb-3">
+          <label for="note" class="form-label">Note</label>
+          <textarea class="form-control" id="note" name="note" rows="3"></textarea>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <a href="/eventi/ricerca" class="btn btn-secondary">Annulla</a>
+          <button type="submit" class="btn btn-success">Salva Evento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
