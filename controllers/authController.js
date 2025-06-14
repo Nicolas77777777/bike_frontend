@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import { apiFetch } from '../utils/apiFetch.js';
 
 export const showLogin = (req, res) => {
   res.render('login', { errore: null });
@@ -8,9 +8,8 @@ export const handleLogin = async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const response = await fetch('http://localhost:3000/controllologin', {
+    const response = await apiFetch('/controllologin', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
 
@@ -30,3 +29,4 @@ export const handleLogin = async (req, res) => {
 export const logout = (req, res) => {
   res.redirect('/');
 };
+
