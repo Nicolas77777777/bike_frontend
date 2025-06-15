@@ -1,0 +1,45 @@
+<%- include('partials/header') %>
+
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex align-items-center mb-4">
+        <img src="/img/logo.png" alt="Logo" class="logo me-3">
+        <h2 class="mb-0">Risultati Ricerca Clienti</h2>
+      </div>
+
+      <% if (clienti.length === 0) { %>
+        <p class="text-muted">Nessun cliente trovato con i criteri di ricerca indicati.</p>
+      <% } else { %>
+        <table class="table table-bordered table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th>Nome</th>
+              <th>Cognome / Rag. Soc.</th>
+              <th>Email</th>
+              <th>Cellulare</th>
+              <th>Cod. Fiscale / P.IVA</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% clienti.forEach(cliente => { %>
+              <tr>
+                <td><%= cliente.nome %></td>
+                <td><%= cliente.cognome_rag_soc %></td>
+                <td><%= cliente.email %></td>
+                <td><%= cliente.cellulare %></td>
+                <td><%= cliente.cf_piva %></td>
+                <td>
+                  <a href="/clienti/<%= cliente.id_cliente %>/modifica" class="btn btn-sm btn-warning">Modifica</a>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

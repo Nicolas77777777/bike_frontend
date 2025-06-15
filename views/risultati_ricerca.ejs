@@ -3,43 +3,260 @@
 <div class="container py-4">
   <div class="card shadow-sm">
     <div class="card-body">
-      <div class="d-flex align-items-center mb-4">
-        <img src="/img/logo.png" alt="Logo" class="logo me-3">
-        <h2 class="mb-0">Risultati Ricerca Clienti</h2>
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="d-flex align-items-center">
+          <img src="/img/logo.png" alt="Logo" class="logo me-3">
+          <div>
+            <h2 class="mb-0">
+              <% if (modalitaEliminazione === true) { %>
+                Risultati Ricerca - Modalità Eliminazione
+              <% } else { %>
+                Risultati Ricerca
+              <% } %>
+            </h2>
+            <small class="text-muted">
+              <% if (modalitaEliminazione === true) { %>
+                Seleziona il cliente da eliminare
+              <% } else { %>
+                Clienti trovati nella ricerca
+              <% } %>
+            </small>
+          </div>
+        </div>
+        <a href="/clienti/form<% if (modalitaEliminazione === true) { %>?elimina=true<% } %>" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i>Nuova Ricerca
+        </a>
       </div>
 
-      <% if (clienti.length === 0) { %>
-        <p class="text-muted">Nessun cliente trovato con i criteri di ricerca indicati.</p>
-      <% } else { %>
-        <table class="table table-bordered table-hover">
-          <thead class="table-dark">
-            <tr>
-              <th>Nome</th>
-              <th>Cognome / Rag. Soc.</th>
-              <th>Email</th>
-              <th>Cellulare</th>
-              <th>Cod. Fiscale / P.IVA</th>
-              <th>Azioni</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% clienti.forEach(cliente => { %>
+      <!-- Alert per modalità eliminazione -->
+      <% if (modalitaEliminazione === true && clienti && clienti.length > 0) { %>
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          <strong>Attenzione:</strong> Stai per eliminare un cliente. Questa azione eliminerà anche tutte le sue iscrizioni agli eventi.
+        </div>
+      <% } %>
+
+      <% if (errore) { %>
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-circle me-2"></i>
+          <%= errore %>
+          <% if (errore.includes('associato a eventi')) { %>
+            <br><small class="mt-2 d-block">
+              💡 <strong>Suggerimento:</strong> Prima di eliminare il cliente, rimuovi le sue iscrizioni agli eventi dalla sezione "Iscrizioni".
+            </small>
+          <% } %>
+        </div>
+      <% } %>
+      <% if (successo) { %>
+        <div class="alert alert-success">
+          <i class="bi bi-check-circle me-2"></i>
+          <%= successo %>
+        </div>
+      <% } %>
+
+      <% if (clienti && clienti.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead class="table-dark">
               <tr>
-                <td><%= cliente.nome %></td>
-                <td><%= cliente.cognome_rag_soc %></td>
-                <td><%= cliente.email %></td>
-                <td><%= cliente.cellulare %></td>
-                <td><%= cliente.cf_piva %></td>
-                <td>
-                  <a href="/clienti/<%= cliente.id_cliente %>/modifica" class="btn btn-sm btn-warning">Modifica</a>
-                </td>
+                <th>Tessera</th>
+                <th>Cognome/Ragione Sociale</th>
+                <th>Nome</th>
+                <th>CF/P.IVA</th>
+                <th>Email</th>
+                <th>Cellulare</th>
+                <th>Azioni</th>
               </tr>
-            <% }); %>
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              <% clienti.forEach(cliente => { %>
+                <tr>
+                  <td><span class="badge bg-secondary">#<%= cliente.numero_tessera || cliente.id_cliente %></span></td>
+                  <td><%= cliente.cognome_rag_soc || '-' %></td>
+                  <td><%= cliente.nome || '-' %></td>
+                  <td><%= cliente.cf_piva || '-' %></td>
+                  <td>
+                    <% if (cliente.email) { %>
+                      <a href="mailto:<%= cliente.email %>" class="text-decoration-none">
+                        <%= cliente.email %>
+                      </a>
+                    <% } else { %>
+                      -
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (cliente.cellulare) { %>
+                      <a href="tel:<%= cliente.cellulare %>" class="text-decoration-none">
+                        <%= cliente.cellulare %>
+                      </a>
+                    <% } else { %>
+                      -
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (modalitaEliminazione === true) { %>
+                      <!-- MODALITÀ ELIMINAZIONE -->
+                      <button type="button" class="btn btn-danger btn-sm" 
+                              onclick="confermaEliminazione('<%= cliente.id_cliente %>', '<%= (cliente.cognome_rag_soc || cliente.nome || '').replace(/'/g, '&apos;') %>', '<%= cliente.numero_tessera || cliente.id_cliente %>')">
+                        <i class="bi bi-trash me-1"></i>Elimina
+                      </button>
+                      <button type="button" class="btn btn-info btn-sm ms-1" 
+                              onclick="visualizzaEventiCliente('<%= cliente.id_cliente %>', '<%= (cliente.cognome_rag_soc || cliente.nome || '').replace(/'/g, '&apos;') %>')">
+                        <i class="bi bi-calendar me-1"></i>Eventi
+                      </button>
+                    <% } else { %>
+                      <!-- MODALITÀ NORMALE -->
+                      <a href="/clienti/<%= cliente.id_cliente %>/modifica" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil me-1"></i>Modifica
+                      </a>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else if (clienti && clienti.length === 0) { %>
+        <div class="alert alert-info text-center">
+          <i class="bi bi-info-circle me-2"></i>
+          Nessun cliente trovato con i criteri di ricerca specificati.
+        </div>
       <% } %>
     </div>
   </div>
 </div>
+
+<!-- Modal di conferma eliminazione -->
+<div class="modal fade" id="modalConfermaEliminazione" tabindex="-1" aria-labelledby="modalConfermaEliminazioneLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="modalConfermaEliminazioneLabel">
+          <i class="bi bi-exclamation-triangle me-2"></i>Conferma Eliminazione Cliente
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">Sei sicuro di voler eliminare il cliente:</p>
+        <div class="alert alert-warning">
+          <strong id="nomeClienteEliminazione"></strong><br>
+          <small>Tessera: #<span id="tesseraClienteEliminazione"></span></small>
+        </div>
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-circle me-1"></i>
+          <strong>Attenzione:</strong> Questa azione eliminerà:
+          <ul class="mb-0 mt-2">
+            <li>Il cliente dal database</li>
+            <li>Tutte le sue iscrizioni agli eventi (tabella cliente_evento)</li>
+          </ul>
+        </div>
+        <p class="text-muted">
+          Questa azione non può essere annullata.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+        <a href="#" id="btnConfermaEliminazione" class="btn btn-danger">
+          <i class="bi bi-trash me-1"></i>Elimina Cliente
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal per visualizzare eventi del cliente -->
+<div class="modal fade" id="modalEventiCliente" tabindex="-1" aria-labelledby="modalEventiClienteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title" id="modalEventiClienteLabel">
+          <i class="bi bi-calendar me-2"></i>Eventi del Cliente
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">Eventi a cui è iscritto il cliente: <strong id="nomeClienteEventi"></strong></p>
+        <div id="listaEventiCliente">
+          <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Caricamento...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Funzione per gestire la conferma eliminazione
+function confermaEliminazione(clienteId, nomeCliente, numeroTessera) {
+  // Imposta il nome del cliente nel modal
+  document.getElementById('nomeClienteEliminazione').textContent = nomeCliente;
+  document.getElementById('tesseraClienteEliminazione').textContent = numeroTessera;
+  
+  // Imposta il link di eliminazione
+  document.getElementById('btnConfermaEliminazione').href = `/clienti/elimina/${clienteId}`;
+  
+  // Mostra il modal
+  const modal = new bootstrap.Modal(document.getElementById('modalConfermaEliminazione'));
+  modal.show();
+}
+
+// Funzione per visualizzare eventi del cliente
+async function visualizzaEventiCliente(clienteId, nomeCliente) {
+  // Imposta il nome del cliente nel modal
+  document.getElementById('nomeClienteEventi').textContent = nomeCliente;
+  
+  // Mostra il modal
+  const modal = new bootstrap.Modal(document.getElementById('modalEventiCliente'));
+  modal.show();
+  
+  // Carica gli eventi del cliente
+  try {
+    // Usa l'endpoint delle rotte cliente-evento che hai mostrato
+    const response = await fetch(`/api/cliente-evento/cliente/${clienteId}/eventi`);
+    const eventi = await response.json();
+    
+    const listaContainer = document.getElementById('listaEventiCliente');
+    
+    if (eventi.length === 0) {
+      listaContainer.innerHTML = `
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle me-2"></i>
+          Questo cliente non è iscritto a nessun evento.
+        </div>
+      `;
+    } else {
+      let html = '<div class="list-group">';
+      eventi.forEach(evento => {
+        html += `
+          <div class="list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+              <h6 class="mb-1">${evento.titolo}</h6>
+              <small>${new Date(evento.data_inizio).toLocaleDateString('it-IT')}</small>
+            </div>
+            <p class="mb-1">${evento.categoria_descrizione || 'Categoria non specificata'}</p>
+            <small>${evento.luogo || 'Luogo non specificato'}</small>
+          </div>
+        `;
+      });
+      html += '</div>';
+      listaContainer.innerHTML = html;
+    }
+  } catch (error) {
+    console.error('Errore nel caricamento eventi:', error);
+    document.getElementById('listaEventiCliente').innerHTML = `
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-circle me-2"></i>
+        Errore nel caricamento degli eventi del cliente.
+      </div>
+    `;
+  }
+}
+</script>
 
 <%- include('partials/footer') %>
