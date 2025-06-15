@@ -29,3 +29,7 @@ export const handleLogin = async (req, res) => {
     res.render('login', { errore: 'Errore del server' });
   }
 };
+
+export const logout = (req, res) => {
+  res.redirect('/');
+};
