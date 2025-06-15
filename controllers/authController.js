@@ -10,6 +10,7 @@ export const handleLogin = async (req, res) => {
   try {
     const response = await apiFetch('/controllologin', {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
 
@@ -18,15 +19,13 @@ export const handleLogin = async (req, res) => {
     }
 
     const utente = await response.json();
-    res.render('home', { utente: utente[0] });
+    console.log('✅ Login riuscito per utente:', utente[0]?.username);
 
+    // ✅ CORRETTO: Redirect alla home invece di renderizzare direttamente
+    // Questo permette alla route /home di gestire correttamente il caricamento
+    res.redirect('/home');
   } catch (err) {
-    console.error("Errore autenticazione:", err);
+    console.error("❌ Errore autenticazione:", err);
     res.render('login', { errore: 'Errore del server' });
   }
 };
-
-export const logout = (req, res) => {
-  res.redirect('/');
-};
-
