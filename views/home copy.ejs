@@ -1,0 +1,76 @@
+<%- include('partials/header', { titolo: 'Home - Bike and Hike' }) %>
+
+<div class="container-fluid">
+  <div class="row gx-0">
+    <!-- Sidebar -->
+    <div class="col-xl-3 col-lg-4 col-md-5">
+      <%- include('partials/sidebar') %>
+    </div>
+
+    <!-- Contenuto principale -->
+    <div class="col-xl-9 col-lg-8 col-md-7 p-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-4">
+            <img src="/img/logo.png" alt="Logo" class="logo me-3">
+            <h2 class="mb-0">Dashboard Associazione Bike and Hike</h2>
+          </div>
+          <p class="lead mt-2">
+            Benvenuto nella dashboard dell'associazione!
+            Da qui puoi gestire clienti, eventi e configurazioni.
+          </p>
+
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mt-3">
+            <!-- Clienti -->
+            <div class="col">
+              <div class="card border-0 bg-primary text-white h-100">
+                <div class="card-body text-center">
+                  <i class="bi bi-people fs-1 mb-2"></i>
+                  <h5>Clienti</h5>
+                  <div class="d-grid gap-1">
+                    <a href="/clienti/nuovo" class="btn btn-light btn-sm">Nuovo</a>
+                    <a href="/clienti/form" class="btn btn-light btn-sm">Modifica</a>
+                    <a href="/clienti/lista" class="btn btn-light btn-sm">Lista</a>
+                    <a href="/clienti/elimina" class="btn btn-light btn-sm">Elimina</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Eventi -->
+            <div class="col">
+              <div class="card border-0 bg-warning text-white h-100">
+                <div class="card-body text-center">
+                  <i class="bi bi-calendar-event fs-1 mb-2"></i>
+                  <h5>Eventi</h5>
+                  <div class="d-grid gap-1">
+                    <a href="/eventi/nuovo" class="btn btn-light btn-sm">Nuovo</a>
+                    <a href="/eventi/ricerca" class="btn btn-light btn-sm">Modifica</a>
+                    <a href="/iscrizioni" class="btn btn-light btn-sm">Iscrizioni</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tipologiche -->
+            <div class="col">
+              <div class="card border-0 bg-info text-white h-100">
+                <div class="card-body text-center">
+                  <i class="bi bi-gear fs-1 mb-2"></i>
+                  <h5>Tipologiche</h5>
+                  <div class="d-grid gap-1">
+                    <a href="/tipologiche/nuovo" class="btn btn-light btn-sm">Inserimento</a>
+                    <a href="/tipologiche/ricerca" class="btn btn-light btn-sm">Modifica</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
