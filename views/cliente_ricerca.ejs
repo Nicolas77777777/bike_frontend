@@ -6,10 +6,31 @@
       <div class="d-flex align-items-center mb-3">
         <img src="/img/logo.png" alt="Logo" class="logo me-3">
         <div>
-          <h2 class="mb-0">Ricerca Cliente</h2>
-          <small class="text-muted">Inserisci almeno un campo per avviare la ricerca</small>
+          <!-- ✅ MODIFICATO: Titolo dinamico basato sulla modalità con controllo di sicurezza -->
+          <h2 class="mb-0">
+            <% if (typeof modalitaEliminazione !== 'undefined' && modalitaEliminazione) { %>
+              Ricerca Cliente per Eliminazione
+            <% } else { %>
+              Ricerca Cliente
+            <% } %>
+          </h2>
+          <small class="text-muted">
+            <% if (typeof modalitaEliminazione !== 'undefined' && modalitaEliminazione) { %>
+              Cerca il cliente da eliminare - Inserisci almeno un campo per avviare la ricerca
+            <% } else { %>
+              Inserisci almeno un campo per avviare la ricerca
+            <% } %>
+          </small>
         </div>
       </div>
+
+      <!-- ✅ AGGIUNTO: Alert per modalità eliminazione con controllo di sicurezza -->
+      <% if (typeof modalitaEliminazione !== 'undefined' && modalitaEliminazione) { %>
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          <strong>Modalità Eliminazione:</strong> I risultati della ricerca mostreranno i pulsanti per eliminare i clienti.
+        </div>
+      <% } %>
 
       <% if (errore) { %>
         <div class="alert alert-danger"><%= errore %></div>
@@ -18,7 +39,13 @@
         <div class="alert alert-success"><%= successo %></div>
       <% } %>
 
+      <!-- ✅ MODIFICATO: Form che mantiene il parametro elimina -->
       <form action="/clienti/ricerca" method="GET">
+        <!-- ✅ AGGIUNTO: Campo nascosto per mantenere la modalità eliminazione con controllo -->
+        <% if (typeof modalitaEliminazione !== 'undefined' && modalitaEliminazione) { %>
+          <input type="hidden" name="elimina" value="true">
+        <% } %>
+        
         <div class="row mb-3">
           <div class="col-md-4">
             <label class="form-label">Cognome / Ragione Sociale</label>
@@ -46,7 +73,13 @@
         </div>
 
         <div class="text-end">
-          <button type="submit" class="btn btn-primary">Ricerca</button>
+          <button type="submit" class="btn btn-primary">
+            <% if (typeof modalitaEliminazione !== 'undefined' && modalitaEliminazione) { %>
+              <i class="bi bi-search me-1"></i>Cerca per Eliminare
+            <% } else { %>
+              <i class="bi bi-search me-1"></i>Ricerca
+            <% } %>
+          </button>
         </div>
       </form>
     </div>

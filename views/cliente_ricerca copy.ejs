@@ -1,0 +1,56 @@
+<%- include('partials/header') %>
+
+<div class="container py-4">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex align-items-center mb-3">
+        <img src="/img/logo.png" alt="Logo" class="logo me-3">
+        <div>
+          <h2 class="mb-0">Ricerca Cliente</h2>
+          <small class="text-muted">Inserisci almeno un campo per avviare la ricerca</small>
+        </div>
+      </div>
+
+      <% if (errore) { %>
+        <div class="alert alert-danger"><%= errore %></div>
+      <% } %>
+      <% if (successo) { %>
+        <div class="alert alert-success"><%= successo %></div>
+      <% } %>
+
+      <form action="/clienti/ricerca" method="GET">
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Cognome / Ragione Sociale</label>
+            <input type="text" name="cognome_rag_soc" class="form-control">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Nome</label>
+            <input type="text" name="nome" class="form-control">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Codice Fiscale / P.IVA</label>
+            <input type="text" name="cf_piva" class="form-control">
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Cellulare</label>
+            <input type="text" name="cellulare" class="form-control">
+          </div>
+        </div>
+
+        <div class="text-end">
+          <button type="submit" class="btn btn-primary">Ricerca</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
