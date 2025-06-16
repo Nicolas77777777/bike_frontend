@@ -1,10 +1,10 @@
-import fetch from 'node-fetch';
+import { apiFetch } from '../utils/apiFetch.js';
 
 // 🔽 Mostra il form per creare un nuovo evento
 export const mostraFormNuovoEvento = async (req, res) => {
   try {
     // ✅ CORRETTO: usa lo stesso endpoint che funziona per tipologiche
-    const response = await fetch('http://localhost:3000/tipologiche/ricerca');
+    const response = await apiFetch('/tipologiche/ricerca');
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -31,7 +31,7 @@ export const mostraFormNuovoEvento = async (req, res) => {
 export const salvaNuovoEvento = async (req, res) => {
   try {
     // ✅ CORRETTO: endpoint eventi (assumendo che il backend usi /eventi)
-    const response = await fetch('http://localhost:3000/evento/nuovo', {
+    const response = await apiFetch('/evento/nuovo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -48,7 +48,7 @@ export const salvaNuovoEvento = async (req, res) => {
     });
 
     // Recupera sempre le tipologiche per ri-renderizzare la pagina
-    const tipologicheRes = await fetch('http://localhost:3000/tipologiche/ricerca');
+    const tipologicheRes = await apiFetch('/tipologiche/ricerca');
     const tipologiche = await tipologicheRes.json();
 
     if (response.ok) {
@@ -70,7 +70,7 @@ export const salvaNuovoEvento = async (req, res) => {
     
     // Carica tipologiche anche in caso di errore
     try {
-      const tipologicheRes = await fetch('http://localhost:3000/tipologiche/ricerca');
+      const tipologicheRes = await apiFetch('/tipologiche/ricerca');
       const tipologiche = await tipologicheRes.json();
       
       res.render('eventi_nuovo', {
@@ -91,7 +91,7 @@ export const salvaNuovoEvento = async (req, res) => {
 // ✅ Mostra la pagina di ricerca evento (semplificata per il debugging)
 export const mostraFormRicercaEvento = async (req, res) => {
   try {
-    const response = await fetch('http://localhost:3000/tipologiche/ricerca');
+    const response = await apiFetch('/tipologiche/ricerca');
     const tipologiche = await response.json();
 
     res.render('eventi_ricerca', { 
@@ -113,7 +113,6 @@ export const mostraFormRicercaEvento = async (req, res) => {
   }
 };
 
-
 // ✅ Esegue la ricerca evento e mostra i risultati
 export const eseguiRicercaEvento = async (req, res) => {
   try {
@@ -122,8 +121,8 @@ export const eseguiRicercaEvento = async (req, res) => {
 
     // Chiamate parallele a eventi e tipologiche
     const [eventiRes, tipologicheRes] = await Promise.all([
-      fetch(`http://localhost:3000/evento/ricerca?${query}`),
-      fetch('http://localhost:3000/tipologiche/ricerca')
+      apiFetch(`/evento/ricerca?${query}`),
+      apiFetch('/tipologiche/ricerca')
     ]);
 
     if (!eventiRes.ok || !tipologicheRes.ok) {
@@ -157,7 +156,6 @@ export const eseguiRicercaEvento = async (req, res) => {
   }
 };
 
-
 // ✅ Mostra form di modifica evento
 export const mostraFormModificaEvento = async (req, res) => {
   const { id } = req.params;
@@ -167,8 +165,8 @@ export const mostraFormModificaEvento = async (req, res) => {
     
     // Carica evento E tipologiche
     const [eventoRes, tipologicheRes] = await Promise.all([
-      fetch(`http://localhost:3000/evento/${id}`),
-      fetch('http://localhost:3000/tipologiche/ricerca')
+      apiFetch(`/evento/${id}`),
+      apiFetch('/tipologiche/ricerca')
     ]);
 
     if (!eventoRes.ok) {
@@ -199,7 +197,6 @@ export const mostraFormModificaEvento = async (req, res) => {
   }
 };
 
-
 // ✅ Salva le modifiche evento
 export const salvaModificaEvento = async (req, res) => {
   const { id } = req.params;
@@ -208,7 +205,7 @@ export const salvaModificaEvento = async (req, res) => {
     console.log('💾 Salvataggio modifica evento ID:', id, 'Dati:', req.body);
     
     // ✅ CORRETTO: endpoint per modifica eventi
-    const response = await fetch(`http://localhost:3000/evento/${id}/modifica`, {
+    const response = await apiFetch(`/evento/${id}/modifica`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -247,7 +244,7 @@ export const eliminaEvento = async (req, res) => {
     console.log('🗑️ Eliminazione evento ID:', id);
     
     // ✅ Chiamata DELETE al backend
-    const response = await fetch(`http://localhost:3000/evento/${id}/elimina`, {
+    const response = await apiFetch(`/evento/${id}/elimina`, {
       method: 'DELETE'
     });
 

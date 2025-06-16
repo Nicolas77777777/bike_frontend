@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import { apiFetch } from '../utils/apiFetch.js';
 
 // 🔽 Mostra il form di inserimento
 export const mostraFormInserimento = (req, res) => {
@@ -10,7 +10,7 @@ export const salvaNuovaTipologica = async (req, res) => {
   try {
     console.log('📝 Salvataggio nuova tipologica:', req.body);
     
-    const response = await fetch('http://localhost:3000/tipologiche/nuovo', {
+    const response = await apiFetch('/tipologiche/nuovo', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
@@ -49,10 +49,10 @@ export const ricercaTipologiche = async (req, res) => {
     console.log('🔗 Query string generata:', query);
 
     // ✅ Endpoint backend corretto
-    const backendUrl = `http://localhost:3000/tipologiche/ricerca?${query}`;
-    console.log('📡 Chiamata backend:', backendUrl);
+    const endpoint = `/tipologiche/ricerca?${query}`;
+    console.log('📡 Chiamata backend:', endpoint);
 
-    const response = await fetch(backendUrl);
+    const response = await apiFetch(endpoint);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -89,7 +89,7 @@ export const mostraFormModifica = async (req, res) => {
   try {
     console.log('🔧 Caricamento tipologica per modifica, ID:', id);
     
-    const response = await fetch(`http://localhost:3000/tipologiche/${id}`);
+    const response = await apiFetch(`/tipologiche/${id}`);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -113,7 +113,7 @@ export const salvaModificaTipologica = async (req, res) => {
   try {
     console.log('💾 Salvataggio modifica tipologica ID:', id, 'Dati:', req.body);
     
-    const response = await fetch(`http://localhost:3000/tipologiche/${id}/modifica`, {
+    const response = await apiFetch(`/tipologiche/${id}/modifica`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
@@ -141,7 +141,7 @@ export const eliminaTipologica = async (req, res) => {
     console.log('🗑️ Eliminazione tipologica ID:', id);
     
     // ✅ Chiamata DELETE al backend
-    const response = await fetch(`http://localhost:3000/tipologiche/${id}`, {
+    const response = await apiFetch(`/tipologiche/${id}`, {
       method: 'DELETE'
     });
 

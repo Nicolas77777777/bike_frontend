@@ -1,6 +1,4 @@
-
-import fetch from 'node-fetch';
-
+import { apiFetch } from '../utils/apiFetch.js';
 
 export async function esportaIscrittiEvento(req, res) {
   const { id_evento } = req.params;
@@ -56,11 +54,10 @@ export async function esportaIscrittiEvento(req, res) {
   }
 }
 
-
 // ✅ Mostra il form principale con eventuale evento selezionato e clienti trovati
 export const mostraFormIscrizione = async (req, res) => {
   try {
-    const eventiRes = await fetch('http://localhost:3000/evento/ricerca');
+    const eventiRes = await apiFetch('/evento/ricerca');
     const eventi = await eventiRes.json();
 
     const idEventoSelezionato = req.query.id_evento || null;
@@ -94,7 +91,7 @@ export const selezionaEvento = (req, res) => {
 export const ricercaClienti = async (req, res) => {
   const query = new URLSearchParams(req.query).toString();
   try {
-    const clientiRes = await fetch(`http://localhost:3000/cliente/ricerca?${query}`);
+    const clientiRes = await apiFetch(`/cliente/ricerca?${query}`);
     const clienti = await clientiRes.json();
 
     const redirectUrl = `/iscrizioni?id_evento=${req.query.id_evento}&clienti=${encodeURIComponent(JSON.stringify(clienti))}`;
@@ -108,7 +105,7 @@ export const ricercaClienti = async (req, res) => {
 
 export const salvaIscrizione = async (req, res) => {
   try {
-    const response = await fetch('http://localhost:3000/iscrizioni/iscrivi', {
+    const response = await apiFetch('/iscrizioni/iscrivi', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -142,14 +139,13 @@ export const salvaIscrizione = async (req, res) => {
   }
 };
 
-
 export const mostraIscrittiEvento = async (req, res) => {
   const { id_evento } = req.params;
 
   try {
     const [eventoRes, iscrittiRes] = await Promise.all([
-      fetch(`http://localhost:3000/evento/${id_evento}`),
-      fetch(`http://localhost:3000/iscrizioni/evento/${id_evento}/clienti`)
+      apiFetch(`/evento/${id_evento}`),
+      apiFetch(`/iscrizioni/evento/${id_evento}/clienti`)
     ]);
 
     const evento = await eventoRes.json();
@@ -172,8 +168,7 @@ export const exportExcelIscrittiEvento = async (req, res) => {
   const { id_evento } = req.params;
 
   try {
-    const res = await fetch(`http://localhost:3000/iscrizioni/evento/${idEvento}/export`);
-
+    const response = await apiFetch(`/iscrizioni/evento/${id_evento}/export`);
 
     if (!response.ok) {
       throw new Error('Errore nel download del file Excel');
@@ -189,13 +184,12 @@ export const exportExcelIscrittiEvento = async (req, res) => {
   }
 };
 
-
 // ✅ Esporta in PDF gli iscritti a un evento
 export const exportPdfIscrittiEvento = async (req, res) => {
   const { id_evento } = req.params;
 
   try {
-    const response = await fetch(`http://localhost:3000/iscrizioni/evento/${id_evento}/export-pdf`);
+    const response = await apiFetch(`/iscrizioni/evento/${id_evento}/export-pdf`);
     
     if (!response.ok) {
       throw new Error(`Errore download: ${response.status}`);
