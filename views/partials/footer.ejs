@@ -1,23 +1,119 @@
-<footer class="text-center text-white mt-5 py-4 bg-dark bg-opacity-75">
+<footer class="text-center text-white mt-5 py-4 bg-primary bg-gradient">
   <div class="container">
-    <img src="/img/logo.png" alt="Logo" class="mb-2" width="50" height="50">
-    <p class="mb-2">Seguici su:</p>
-    <div class="d-flex justify-content-center gap-3 mb-2">
-      <a href="https://www.facebook.com" target="_blank" class="text-white text-decoration-none">
-        <i class="bi bi-facebook"></i> Facebook
-      </a>
-      <a href="https://www.instagram.com" target="_blank" class="text-white text-decoration-none">
-        <i class="bi bi-instagram"></i> Instagram
-      </a>
-      <a href="mailto:info@associazionebikeandHike.it" class="text-white text-decoration-none">
-        <i class="bi bi-envelope"></i> Email
-      </a>
+    <!-- Logo e Nome -->
+    <div class="d-flex justify-content-center align-items-center mb-3">
+      <img src="/img/logo.png" alt="Logo Bike and Hike" class="me-2" width="40" height="40">
+      <h5 class="mb-0 fw-bold">Dashboard Bike and Hike</h5>
     </div>
-    <small>© <%= new Date().getFullYear() %> Associazione Bike and Hike - Tutti i diritti riservati</small>
+
+    <!-- Links Dashboard -->
+    <div class="row mb-3">
+      <div class="col-md-3">
+        <h6 class="fw-semibold mb-2">
+          <i class="bi bi-people-fill"></i> Gestione
+        </h6>
+        <div class="d-flex flex-column gap-1">
+          <a href="/clienti/lista" class="text-white-50 text-decoration-none small">
+            <i class="bi bi-person-lines-fill"></i> Clienti
+          </a>
+          <a href="/eventi/ricerca" class="text-white-50 text-decoration-none small">
+            <i class="bi bi-calendar-event"></i> Eventi
+          </a>
+          <a href="/iscrizioni" class="text-white-50 text-decoration-none small">
+            <i class="bi bi-clipboard-check"></i> Iscrizioni
+          </a>
+        </div>
+      </div>
+      
+      <div class="col-md-3">
+        <h6 class="fw-semibold mb-2">
+          <i class="bi bi-bar-chart-fill"></i> Statistiche
+        </h6>
+        <div class="d-flex flex-column gap-1">
+          <a href="/clienti/statistiche" class="text-white-50 text-decoration-none small">
+            <i class="bi bi-graph-up"></i> Report Clienti
+          </a>
+          <a href="/tipologiche/ricerca" class="text-white-50 text-decoration-none small">
+            <i class="bi bi-tags"></i> Tipologiche
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <h6 class="fw-semibold mb-2">
+          <i class="bi bi-share-fill"></i> Social
+        </h6>
+        <div class="d-flex flex-column gap-1">
+          <a href="https://www.facebook.com" target="_blank" class="text-white-50 text-decoration-none small">
+            <i class="bi bi-facebook"></i> Facebook
+          </a>
+          <a href="https://www.instagram.com" target="_blank" class="text-white-50 text-decoration-none small">
+            <i class="bi bi-instagram"></i> Instagram
+          </a>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <h6 class="fw-semibold mb-2">
+          <i class="bi bi-envelope-fill"></i> Contatti
+        </h6>
+        <div class="d-flex flex-column gap-1">
+          <a href="mailto:info@associazionebikeandHike.it" class="text-white-50 text-decoration-none small">
+            <i class="bi bi-envelope"></i> Email
+          </a>
+          <span class="text-white-50 small">
+            <i class="bi bi-geo-alt"></i> Gestione Dashboard
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Divisore -->
+    <hr class="border-white-50 my-3">
+
+    <!-- Copyright e Info Sistema -->
+    <div class="row align-items-center">
+      <div class="col-md-6 text-md-start text-center">
+        <small class="text-white-50">
+          © <%= new Date().getFullYear() %> Associazione Bike and Hike
+        </small>
+      </div>
+      <div class="col-md-6 text-md-end text-center">
+        <small class="text-white-50">
+          <i class="bi bi-shield-check"></i> Dashboard v1.0 - Sistema di Gestione
+        </small>
+      </div>
+    </div>
   </div>
 </footer>
 
 <!-- Bootstrap Bundle con Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Script Dashboard per interazioni -->
+<script>
+// Tooltip per migliorare UX
+document.addEventListener('DOMContentLoaded', function() {
+  // Inizializza tooltip se presenti
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+
+  // Aggiunge effetto hover sui link del footer
+  const footerLinks = document.querySelectorAll('footer a');
+  footerLinks.forEach(link => {
+    link.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-1px)';
+      this.style.transition = 'all 0.2s ease';
+    });
+    
+    link.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+    });
+  });
+});
+</script>
+
 </body>
 </html>
