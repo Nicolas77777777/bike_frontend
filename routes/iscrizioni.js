@@ -7,7 +7,7 @@ import {
   salvaIscrizione,
   mostraIscrittiEvento,
   exportExcelIscrittiEvento,
-  exportPdfIscrittiEvento // ✅ aggiunto per PDF
+  exportPdfIscrittiEvento
 } from '../controllers/iscrizioniController.js';
 
 const router = express.Router();
@@ -21,13 +21,15 @@ router.post('/seleziona-evento', selezionaEvento);
 // ✅ Ricerca clienti in base ai campi del form
 router.get('/ricerca-cliente', ricercaClienti);
 
-
 // ✅ Salva l'iscrizione (cliente → evento)
 router.post('/', salvaIscrizione);
 
+// ✅ Mostra iscritti evento
 router.get('/evento/:id_evento/iscritti', mostraIscrittiEvento);
 
-router.get('/evento/:id_evento/export', exportExcelIscrittiEvento);
+// ✅ EXCEL - Due alias per stessa funzione
+router.get('/evento/:id_evento/export', exportExcelIscrittiEvento);         // Originale per chiamate dirette
+router.get('/evento/:id_evento/export-excel', exportExcelIscrittiEvento);   // Per template form
 
 // ✅ Esporta PDF
 router.get('/evento/:id_evento/export-pdf', exportPdfIscrittiEvento);

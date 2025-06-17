@@ -1,61 +1,5 @@
 import { apiFetch } from '../utils/apiFetch.js';
 
-// ⚠️ EXCEL-POOL-REFACTOR: Questa funzione usa ancora pool.query diretto
-// Dovrebbe essere spostata nel backend e chiamata via API per coerenza architetturale
-export async function esportaIscrittiEvento(req, res) {
-  const { id_evento } = req.params;
-
-  try {
-    // Recupera evento e iscritti
-    const [eventoRes, iscrittiRes] = await Promise.all([
-      pool.query('SELECT * FROM evento WHERE id_evento = $1', [id_evento]),
-      pool.query(
-        `SELECT c.*
-         FROM cliente_evento ce
-         JOIN cliente c ON ce.id_cliente = c.id_cliente
-         WHERE ce.id_evento = $1`,
-        [id_evento]
-      )
-    ]);
-
-    const evento = eventoRes.rows[0];
-    const iscritti = iscrittiRes.rows;
-
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet('Iscritti Evento');
-
-    // Dati evento
-    sheet.addRow(['Evento:', evento.titolo]);
-    sheet.addRow(['Data:', evento.data_inizio?.toISOString().split('T')[0]]);
-    sheet.addRow(['Luogo:', evento.luogo]);
-    sheet.addRow([]); // Riga vuota
-
-    // Intestazioni
-    sheet.addRow(['Nome', 'Cognome/Rag. Soc.', 'Email', 'Cellulare', 'Cod. Fiscale / P.IVA']);
-
-    // Dati iscritti
-    iscritti.forEach(cliente => {
-      sheet.addRow([
-        cliente.nome,
-        cliente.cognome_rag_soc,
-        cliente.email,
-        cliente.cellulare,
-        cliente.cf_piva
-      ]);
-    });
-
-    // Imposta header per download
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="iscritti_evento_${id_evento}.xlsx"`);
-
-    await workbook.xlsx.write(res);
-    res.end();
-  } catch (err) {
-    console.error("❌ Errore generazione Excel:", err);
-    res.status(500).send("Errore generazione file Excel");
-  }
-}
-
 // ✅ Mostra il form principale con eventuale evento selezionato e clienti trovati
 export const mostraFormIscrizione = async (req, res) => {
   try {
@@ -105,6 +49,7 @@ export const ricercaClienti = async (req, res) => {
   }
 };
 
+// ✅ Salva iscrizione
 export const salvaIscrizione = async (req, res) => {
   try {
     const response = await apiFetch('/iscrizioni/iscrivi', {
@@ -141,6 +86,7 @@ export const salvaIscrizione = async (req, res) => {
   }
 };
 
+// ✅ Mostra iscritti evento
 export const mostraIscrittiEvento = async (req, res) => {
   const { id_evento } = req.params;
 
@@ -156,8 +102,8 @@ export const mostraIscrittiEvento = async (req, res) => {
     res.render('risultati_iscritti_eventi', {
       evento,
       iscritti,
-      successo: req.query.successo || null, // ✅ questo risolve l'errore
-      errore: req.query.errore || null      // opzionale, utile in caso di errori
+      successo: req.query.successo || null,
+      errore: req.query.errore || null
     });
   } catch (err) {
     console.error("❌ Errore caricamento iscritti evento:", err);
@@ -165,43 +111,71 @@ export const mostraIscrittiEvento = async (req, res) => {
   }
 };
 
-// ✅ SEMPLIFICATO: Controller frontend per export Excel - STREAM DIRETTO
+// ✅ EXCEL - Funzione unificata con debug
 export const exportExcelIscrittiEvento = async (req, res) => {
   const { id_evento } = req.params;
 
   try {
-    console.log(`📊 Richiesta export Excel per evento ${id_evento}`);
+    console.log(`📊 [DEBUG] Richiesta export Excel per evento ${id_evento}`);
+    console.log(`📊 [DEBUG] apiFetch endpoint: /iscrizioni/evento/${id_evento}/export`);
 
-    // ✅ CHIAMATA DIRETTA AL BACKEND CHE STREAMA IL FILE
+    // ✅ CHIAMATA AL BACKEND
     const response = await apiFetch(`/iscrizioni/evento/${id_evento}/export`);
+
+    console.log(`📊 [DEBUG] Response status: ${response.status}`);
+    console.log(`📊 [DEBUG] Response ok: ${response.ok}`);
+    console.log(`📊 [DEBUG] Response headers:`, Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`❌ Errore backend (${response.status}):`, errorText);
+      console.error(`❌ [DEBUG] Errore backend (${response.status}):`, errorText);
       throw new Error(`Errore nel backend: ${response.status} - ${errorText}`);
     }
 
-    // ✅ IL BACKEND STREAMA DIRETTAMENTE IL FILE
-    // Copia gli header dal backend
+    // ✅ VERIFICA TIPO DI RISPOSTA
     const contentType = response.headers.get('content-type');
+    console.log(`📊 [DEBUG] Content-Type ricevuto: ${contentType}`);
+
+    // Se è JSON, il backend ha restituito un errore o info
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json();
+      console.log(`📊 [DEBUG] Backend ha restituito JSON:`, data);
+      
+      // Se ha un path, è il vecchio comportamento con file salvato
+      if (data.path) {
+        console.log(`📊 [DEBUG] Redirect al file: https://bike-backend-production-9cc5.up.railway.app${data.path}`);
+        return res.redirect(`https://bike-backend-production-9cc5.up.railway.app${data.path}`);
+      }
+    }
+
+    // ✅ SE È UN FILE, STREAMA DIRETTAMENTE
     const contentDisposition = response.headers.get('content-disposition');
     const contentLength = response.headers.get('content-length');
 
+    console.log(`📊 [DEBUG] Content-Disposition: ${contentDisposition}`);
+    console.log(`📊 [DEBUG] Content-Length: ${contentLength}`);
+
+    // Imposta header per download
     if (contentType) res.setHeader('Content-Type', contentType);
     if (contentDisposition) res.setHeader('Content-Disposition', contentDisposition);
     if (contentLength) res.setHeader('Content-Length', contentLength);
 
-    console.log(`📥 Stream Excel direttamente al client`);
+    console.log(`📥 [DEBUG] Inizio stream Excel al client`);
 
     // ✅ PIPE DIRETTO DAL BACKEND AL CLIENT
     response.body.pipe(res);
 
     res.on('finish', () => {
-      console.log(`✅ Download Excel completato per evento ${id_evento}`);
+      console.log(`✅ [DEBUG] Download Excel completato per evento ${id_evento}`);
+    });
+
+    res.on('error', (err) => {
+      console.error(`❌ [DEBUG] Errore durante stream:`, err);
     });
 
   } catch (err) {
-    console.error('❌ Errore export Excel frontend:', err);
+    console.error('❌ [DEBUG] Errore export Excel frontend:', err);
+    console.error('❌ [DEBUG] Stack trace:', err.stack);
     
     if (!res.headersSent) {
       res.status(500).send(`Errore durante il download del file Excel: ${err.message}`);
@@ -209,7 +183,7 @@ export const exportExcelIscrittiEvento = async (req, res) => {
   }
 };
 
-// ✅ AGGIORNATO: Esporta in PDF gli iscritti a un evento - DOWNLOAD DIRETTO
+// ✅ PDF - Mantieni come era
 export const exportPdfIscrittiEvento = async (req, res) => {
   const { id_evento } = req.params;
 
