@@ -10,13 +10,4 @@ export async function apiFetch(path, options = {}) {
   });
 }
 
-export async function apiFetch(path, options = {}) {
-  const url = `${BACKEND_URL}${path}`;
-  console.log('🔗 apiFetch URL COMPLETO:', url);  // ← AGGIUNGI QUESTO
-  console.log('🔗 BACKEND_URL:', BACKEND_URL);    // ← E QUESTO
-  
-  return fetch(url, {
-    headers: { 'Content-Type': 'application/json', ...options.headers },
-    ...options
-  });
-}
+
