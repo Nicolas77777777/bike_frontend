@@ -165,14 +165,14 @@ export const mostraIscrittiEvento = async (req, res) => {
   }
 };
 
-// ✅ NUOVO: Controller frontend per export Excel - DOWNLOAD DIRETTO
+// ✅ SEMPLIFICATO: Controller frontend per export Excel - STREAM DIRETTO
 export const exportExcelIscrittiEvento = async (req, res) => {
   const { id_evento } = req.params;
 
   try {
-    console.log(`📊 Avvio download Excel per evento ${id_evento}`);
+    console.log(`📊 Richiesta export Excel per evento ${id_evento}`);
 
-    // ✅ STEP 1: Chiama il backend per generare il file Excel
+    // ✅ CHIAMATA DIRETTA AL BACKEND CHE STREAMA IL FILE
     const response = await apiFetch(`/iscrizioni/evento/${id_evento}/export`);
 
     if (!response.ok) {
@@ -181,51 +181,28 @@ export const exportExcelIscrittiEvento = async (req, res) => {
       throw new Error(`Errore nel backend: ${response.status} - ${errorText}`);
     }
 
-    const data = await response.json();
-    console.log('✅ Backend response:', data);
+    // ✅ IL BACKEND STREAMA DIRETTAMENTE IL FILE
+    // Copia gli header dal backend
+    const contentType = response.headers.get('content-type');
+    const contentDisposition = response.headers.get('content-disposition');
+    const contentLength = response.headers.get('content-length');
 
-    // ✅ STEP 2: Scarica il file generato dal backend
-    console.log(`📁 Download file da: ${data.path}`);
-    const fileResponse = await apiFetch(data.path);
-    
-    if (!fileResponse.ok) {
-      throw new Error(`Errore nel download del file: ${fileResponse.status}`);
-    }
+    if (contentType) res.setHeader('Content-Type', contentType);
+    if (contentDisposition) res.setHeader('Content-Disposition', contentDisposition);
+    if (contentLength) res.setHeader('Content-Length', contentLength);
 
-    // ✅ STEP 3: Imposta gli header per il download FORZATO
-    const filename = data.filename || `iscritti_evento_${id_evento}.xlsx`;
-    
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    
-    // Aggiungi Content-Length se disponibile per mostrare progresso download
-    const contentLength = fileResponse.headers.get('content-length');
-    if (contentLength) {
-      res.setHeader('Content-Length', contentLength);
-      console.log(`📦 Dimensione file: ${Math.round(contentLength / 1024)} KB`);
-    }
+    console.log(`📥 Stream Excel direttamente al client`);
 
-    console.log(`📥 Inizio stream file Excel "${filename}" all'utente`);
+    // ✅ PIPE DIRETTO DAL BACKEND AL CLIENT
+    response.body.pipe(res);
 
-    // ✅ STEP 4: Stream del file Excel direttamente all'utente
-    fileResponse.body.pipe(res);
-
-    // Log quando il download è completato
     res.on('finish', () => {
       console.log(`✅ Download Excel completato per evento ${id_evento}`);
-    });
-
-    res.on('error', (err) => {
-      console.error(`❌ Errore durante il download:`, err);
     });
 
   } catch (err) {
     console.error('❌ Errore export Excel frontend:', err);
     
-    // Se non abbiamo ancora inviato headers, invia errore
     if (!res.headersSent) {
       res.status(500).send(`Errore durante il download del file Excel: ${err.message}`);
     }
