@@ -1,7 +1,5 @@
 import { apiFetch } from '../utils/apiFetch.js';
 
-// ⚠️ EXCEL-POOL-REFACTOR: Questa funzione usa ancora pool.query diretto
-// Dovrebbe essere spostata nel backend e chiamata via API per coerenza architetturale
 export async function esportaIscrittiEvento(req, res) {
   const { id_evento } = req.params;
 
@@ -165,136 +163,46 @@ export const mostraIscrittiEvento = async (req, res) => {
   }
 };
 
-// ✅ NUOVO: Controller frontend per export Excel - DOWNLOAD DIRETTO
+// ✅ Controller frontend per export Excel
 export const exportExcelIscrittiEvento = async (req, res) => {
   const { id_evento } = req.params;
 
   try {
-    console.log(`📊 Avvio download Excel per evento ${id_evento}`);
-
-    // ✅ STEP 1: Chiama il backend per generare il file Excel
     const response = await apiFetch(`/iscrizioni/evento/${id_evento}/export`);
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ Errore backend (${response.status}):`, errorText);
-      throw new Error(`Errore nel backend: ${response.status} - ${errorText}`);
+      throw new Error('Errore nel download del file Excel');
     }
 
     const data = await response.json();
-    console.log('✅ Backend response:', data);
 
-    // ✅ STEP 2: Scarica il file generato dal backend
-    console.log(`📁 Download file da: ${data.path}`);
-    const fileResponse = await apiFetch(data.path);
-    
-    if (!fileResponse.ok) {
-      throw new Error(`Errore nel download del file: ${fileResponse.status}`);
-    }
-
-    // ✅ STEP 3: Imposta gli header per il download FORZATO
-    const filename = data.filename || `iscritti_evento_${id_evento}.xlsx`;
-    
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    
-    // Aggiungi Content-Length se disponibile per mostrare progresso download
-    const contentLength = fileResponse.headers.get('content-length');
-    if (contentLength) {
-      res.setHeader('Content-Length', contentLength);
-      console.log(`📦 Dimensione file: ${Math.round(contentLength / 1024)} KB`);
-    }
-
-    console.log(`📥 Inizio stream file Excel "${filename}" all'utente`);
-
-    // ✅ STEP 4: Stream del file Excel direttamente all'utente
-    fileResponse.body.pipe(res);
-
-    // Log quando il download è completato
-    res.on('finish', () => {
-      console.log(`✅ Download Excel completato per evento ${id_evento}`);
-    });
-
-    res.on('error', (err) => {
-      console.error(`❌ Errore durante il download:`, err);
-    });
-
+    // 🔁 Reindirizza direttamente al file sul backend
+    res.redirect(`http://localhost:3000${data.path}`);
   } catch (err) {
     console.error('❌ Errore export Excel frontend:', err);
-    
-    // Se non abbiamo ancora inviato headers, invia errore
-    if (!res.headersSent) {
-      res.status(500).send(`Errore durante il download del file Excel: ${err.message}`);
-    }
+    res.status(500).send('Errore durante il download del file Excel');
   }
 };
 
-// ✅ AGGIORNATO: Esporta in PDF gli iscritti a un evento - DOWNLOAD DIRETTO
+// ✅ Esporta in PDF gli iscritti a un evento
 export const exportPdfIscrittiEvento = async (req, res) => {
   const { id_evento } = req.params;
 
   try {
-    console.log(`📄 Avvio download PDF per evento ${id_evento}`);
-
-    // ✅ STEP 1: Chiama il backend per generare il PDF
     const response = await apiFetch(`/iscrizioni/evento/${id_evento}/export-pdf`);
     
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ Errore backend PDF (${response.status}):`, errorText);
-      throw new Error(`Errore download PDF: ${response.status} - ${errorText}`);
+      throw new Error(`Errore download: ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log('✅ PDF generato:', data);
-
-    // ✅ STEP 2: Scarica il file PDF generato
-    console.log(`📁 Download PDF da: ${data.path}`);
-    const fileResponse = await apiFetch(data.path);
-    
-    if (!fileResponse.ok) {
-      throw new Error(`Errore nel download del file PDF: ${fileResponse.status}`);
-    }
-
-    // ✅ STEP 3: Imposta gli header per il download FORZATO
-    const filename = data.filename || `iscritti_evento_${id_evento}.pdf`;
-    
+    // Imposta header per forzare il download
+    res.setHeader('Content-Disposition', `attachment; filename="iscritti_evento_${id_evento}.pdf"`);
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    
-    // Aggiungi Content-Length se disponibile
-    const contentLength = fileResponse.headers.get('content-length');
-    if (contentLength) {
-      res.setHeader('Content-Length', contentLength);
-      console.log(`📦 Dimensione PDF: ${Math.round(contentLength / 1024)} KB`);
-    }
 
-    console.log(`📥 Inizio stream file PDF "${filename}" all'utente`);
-
-    // ✅ STEP 4: Stream del file PDF direttamente all'utente
-    fileResponse.body.pipe(res);
-
-    // Log quando il download è completato
-    res.on('finish', () => {
-      console.log(`✅ Download PDF completato per evento ${id_evento}`);
-    });
-
-    res.on('error', (err) => {
-      console.error(`❌ Errore durante il download PDF:`, err);
-    });
-
+    // Piping dello stream PDF al client
+    response.body.pipe(res);
   } catch (err) {
     console.error('❌ Errore download PDF:', err);
-    
-    // Se non abbiamo ancora inviato headers, invia errore
-    if (!res.headersSent) {
-      res.status(500).send(`Errore durante il download del file PDF: ${err.message}`);
-    }
+    res.status(500).send('Errore durante il download del file PDF');
   }
 };
