@@ -197,15 +197,15 @@ export const mostraFormModificaEvento = async (req, res) => {
   }
 };
 
-// ✅ Salva le modifiche evento
+// ✅ Salva le modifiche evento - ENDPOINT CORRETTO
 export const salvaModificaEvento = async (req, res) => {
   const { id } = req.params;
 
   try {
     console.log('💾 Salvataggio modifica evento ID:', id, 'Dati:', req.body);
     
-    // ✅ CORRETTO: endpoint per modifica eventi
-    const response = await apiFetch(`/evento/${id}/modifica`, {
+    // ✅ CORRETTO: endpoint che corrisponde al backend
+    const response = await apiFetch(`/evento/${id}`, {  // ← RIMOSSO /modifica
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -237,14 +237,14 @@ export const salvaModificaEvento = async (req, res) => {
   }
 };
 
-// ✅ NUOVO: Elimina un evento
+// ✅ Elimina un evento - ENDPOINT CORRETTO
 export const eliminaEvento = async (req, res) => {
   const { id } = req.params;
   try {
     console.log('🗑️ Eliminazione evento ID:', id);
     
-    // ✅ Chiamata DELETE al backend
-    const response = await apiFetch(`/evento/${id}/elimina`, {
+    // ✅ CORRETTO: endpoint che corrisponde al backend
+    const response = await apiFetch(`/evento/${id}`, {  // ← RIMOSSO /elimina
       method: 'DELETE'
     });
 
