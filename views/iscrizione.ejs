@@ -1,54 +1,134 @@
+
 <%- include('partials/header', { titolo: 'Iscrizione Cliente a Evento' }) %>
 
-<!-- ✅ CORRETTO: Mantiene il contesto delle iscrizioni -->
-<form method="GET" action="/iscrizioni" class="mb-3">
-  <div class="row g-3 align-items-end">
-    <div class="col-md-6">
-      <label class="form-label">Ricerca evento per titolo</label>
-      <input type="text" name="titolo" class="form-control" 
-             placeholder="Inserisci parte del titolo" 
-             value="<%= req.query.titolo || '' %>">
+<div class="container py-4">
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h3 class="mb-3">Selezione Evento</h3>
+
+      <% if (erroreEvento) { %>
+        <div class="alert alert-danger"><%= erroreEvento %></div>
+      <% } %>
+
+      <form method="GET" action="/iscrizioni" class="mb-3">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-6">
+            <label class="form-label">Ricerca evento per titolo</label>
+            <input type="text" name="titolo" class="form-control" placeholder="Inserisci parte del titolo" value="<%= req.query.titolo || '' %>">
+          </div>
+          <div class="col-md-3 d-grid">
+            <button type="submit" class="btn btn-primary">Cerca</button>
+          </div>
+        </div>
+      </form>
+
+      <form method="POST" action="/iscrizioni/seleziona-evento">
+        <div class="row mb-3">
+          <div class="col-md-8">
+            <label class="form-label">Oppure seleziona evento</label>
+            <select name="id_evento" class="form-select" onchange="this.form.submit()">
+              <option value="">-- Seleziona evento --</option>
+              <% eventi.forEach(e => { %>
+                <option value="<%= e.id_evento %>" <%= e.id_evento == eventoSelezionato?.id_evento ? 'selected' : '' %>>
+                  <%= e.titolo %> - <%= e.data_inizio?.substring(0,10) %>
+                </option>
+              <% }) %>
+            </select>
+          </div>
+        </div>
+      </form>
+
+      <% if (eventoSelezionato) { %>
+        <div class="alert alert-info">
+          <strong>Evento selezionato:</strong> <%= eventoSelezionato.titolo %>
+        </div>
+      <% } %>
     </div>
-    
-    <!-- ✅ OPZIONALE: Aggiungi filtro categoria -->
-    <div class="col-md-3">
-      <label class="form-label">Categoria</label>
-      <select name="categoria" class="form-select">
-        <option value="">Tutte le categorie</option>
-        <% if (typeof tipologiche !== 'undefined' && tipologiche && tipologiche.length > 0) { %>
-          <% tipologiche.forEach(t => { %>
-            <option value="<%= t.id_tipologica %>" 
-                    <%= req.query.categoria == t.id_tipologica ? 'selected' : '' %>>
-              <%= t.descrizione %>
-            </option>
-          <% }) %>
+  </div>
+
+  <% if (eventoSelezionato) { %>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <img src="/img/logo.png" alt="Logo" class="logo me-3">
+          <div>
+            <h2 class="mb-0">Ricerca Cliente</h2>
+            <small class="text-muted">Inserisci almeno un campo per avviare la ricerca</small>
+          </div>
+        </div>
+
+        <form method="GET" action="/iscrizioni/ricerca-cliente">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Cognome / Ragione Sociale</label>
+              <input type="text" name="cognome_rag_soc" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Nome</label>
+              <input type="text" name="nome" class="form-control">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Codice Fiscale / P.IVA</label>
+              <input type="text" name="cf_piva" class="form-control">
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Cellulare</label>
+              <input type="text" name="cellulare" class="form-control">
+            </div>
+          </div>
+
+          <div class="text-end">
+            <input type="hidden" name="id_evento" value="<%= eventoSelezionato.id_evento %>">
+            <button type="submit" class="btn btn-primary">Ricerca</button>
+          </div>
+        </form>
+
+        <% if (clienti && clienti.length > 0) { %>
+          <hr>
+          <h5>Clienti trovati:</h5>
+          <table class="table table-bordered table-hover mt-3">
+            <thead class="table-dark">
+              <tr>
+                <th>Nome</th>
+                <th>Cognome / Rag. Soc.</th>
+                <th>Email</th>
+                <th>Cellulare</th>
+                <th>Cod. Fiscale / P.IVA</th>
+                <th>Azioni</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% clienti.forEach(cliente => { %>
+                <tr>
+                  <td><%= cliente.nome %></td>
+                  <td><%= cliente.cognome_rag_soc %></td>
+                  <td><%= cliente.email %></td>
+                  <td><%= cliente.cellulare %></td>
+                  <td><%= cliente.cf_piva %></td>
+                  <td>
+                    <form method="POST" action="/iscrizioni">
+                      <input type="hidden" name="id_cliente" value="<%= cliente.id_cliente %>">
+                      <input type="hidden" name="id_evento" value="<%= eventoSelezionato.id_evento %>">
+                      <button type="submit" class="btn btn-sm btn-primary">Seleziona</button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        <% } else if (clienti) { %>
+          <p class="text-muted mt-3">Nessun cliente trovato.</p>
         <% } %>
-      </select>
+      </div>
     </div>
-    
-    <div class="col-md-3 d-grid">
-      <button type="submit" class="btn btn-primary">
-        <i class="bi bi-search"></i> Cerca Eventi
-      </button>
-    </div>
-  </div>
-  
-  <!-- ✅ OPZIONALE: Filtri avanzati -->
-  <div class="row g-3 mt-2">
-    <div class="col-md-4">
-      <label class="form-label">Data inizio da:</label>
-      <input type="date" name="data_inizio" class="form-control" 
-             value="<%= req.query.data_inizio || '' %>">
-    </div>
-    <div class="col-md-4">
-      <label class="form-label">Data fine fino:</label>
-      <input type="date" name="data_fine" class="form-control" 
-             value="<%= req.query.data_fine || '' %>">
-    </div>
-    <div class="col-md-4 d-grid align-self-end">
-      <a href="/iscrizioni" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-clockwise"></i> Reset Filtri
-      </a>
-    </div>
-  </div>
-</form>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>
