@@ -1,4 +1,3 @@
-
 <%- include('partials/header', { titolo: 'Iscrizione Cliente a Evento' }) %>
 
 <div class="container py-4">
@@ -10,42 +9,170 @@
         <div class="alert alert-danger"><%= erroreEvento %></div>
       <% } %>
 
-      <form method="GET" action="/iscrizioni/seleziona-evento" class="mb-3">
-        <div class="row g-3 align-items-end">
-          <div class="col-md-6">
-            <label class="form-label">Ricerca evento per titolo</label>
-            <input type="text" name="titolo" class="form-control" placeholder="Inserisci parte del titolo" value="<%= req.query.titolo || '' %>">
+      <!-- ✅ PRIMO SISTEMA: Ricerca per titolo con risultati filtrati -->
+      <div class="mb-4">
+        <h5 class="text-primary">
+          <i class="bi bi-search me-2"></i>Ricerca Eventi per Titolo
+        </h5>
+        <form method="GET" action="/iscrizioni" class="mb-3">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-6">
+              <label class="form-label">Ricerca evento per titolo</label>
+              <input type="text" name="titolo" class="form-control" 
+                     placeholder="Inserisci parte del titolo" 
+                     value="<%= req.query.titolo || '' %>">
+            </div>
+            <div class="col-md-3 d-grid">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-search me-1"></i>Cerca
+              </button>
+            </div>
+            <div class="col-md-3 d-grid">
+              <a href="/iscrizioni" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-clockwise me-1"></i>Reset
+              </a>
+            </div>
           </div>
-          <div class="col-md-3 d-grid">
-            <button type="submit" class="btn btn-primary">Cerca</button>
+          
+          <!-- ✅ Opzioni aggiuntive per la ricerca -->
+          <div class="row g-3 mt-2">
+            <div class="col-md-4">
+              <label class="form-label">Categoria (opzionale)</label>
+              <select name="categoria" class="form-select">
+                <option value="">Tutte le categorie</option>
+                <% if (typeof tipologiche !== 'undefined' && tipologiche && tipologiche.length > 0) { %>
+                  <% tipologiche.forEach(t => { %>
+                    <option value="<%= t.id_tipologica %>" 
+                            <%= req.query.categoria == t.id_tipologica ? 'selected' : '' %>>
+                      <%= t.descrizione %>
+                    </option>
+                  <% }) %>
+                <% } %>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Data inizio da:</label>
+              <input type="date" name="data_inizio" class="form-control" 
+                     value="<%= req.query.data_inizio || '' %>">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Data fine fino:</label>
+              <input type="date" name="data_fine" class="form-control" 
+                     value="<%= req.query.data_fine || '' %>">
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
 
-      <form method="POST" action="/iscrizioni/seleziona-evento">
-        <div class="row mb-3">
-          <div class="col-md-8">
-            <label class="form-label">Oppure seleziona evento</label>
-            <select name="id_evento" class="form-select" onchange="this.form.submit()">
-              <option value="">-- Seleziona evento --</option>
-              <% eventi.forEach(e => { %>
-                <option value="<%= e.id_evento %>" <%= e.id_evento == eventoSelezionato?.id_evento ? 'selected' : '' %>>
-                  <%= e.titolo %> - <%= e.data_inizio?.substring(0,10) %>
-                </option>
-              <% }) %>
-            </select>
+        <!-- ✅ Risultati ricerca con selezione diretta -->
+        <% if (req.query.titolo || req.query.categoria || req.query.data_inizio || req.query.data_fine) { %>
+          <div class="border rounded p-3 bg-light">
+            <h6>Risultati ricerca eventi:</h6>
+            <% if (eventi && eventi.length > 0) { %>
+              <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                  <thead>
+                    <tr>
+                      <th>Titolo</th>
+                      <th>Categoria</th>
+                      <th>Data Inizio</th>
+                      <th>Luogo</th>
+                      <th>Azione</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% eventi.forEach(e => { %>
+                      <tr>
+                        <td><strong><%= e.titolo %></strong></td>
+                        <td><%= e.categoria_descrizione || 'N/A' %></td>
+                        <td><%= e.data_inizio ? new Date(e.data_inizio).toLocaleDateString('it-IT') : 'N/A' %></td>
+                        <td><%= e.luogo || 'N/A' %></td>
+                        <td>
+                          <form method="GET" action="/iscrizioni" class="d-inline">
+                            <input type="hidden" name="id_evento" value="<%= e.id_evento %>">
+                            <button type="submit" class="btn btn-sm btn-success">
+                              <i class="bi bi-check-circle me-1"></i>Seleziona
+                            </button>
+                          </form>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            <% } else { %>
+              <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                Nessun evento trovato con i criteri di ricerca specificati.
+              </div>
+            <% } %>
           </div>
-        </div>
-      </form>
+        <% } %>
+      </div>
 
+      <hr class="my-4">
+
+      <!-- ✅ SECONDO SISTEMA: Menu a tendina con tutti gli eventi -->
+      <div class="mb-4">
+        <h5 class="text-success">
+          <i class="bi bi-list me-2"></i>Selezione da Lista Completa
+        </h5>
+        <form method="GET" action="/iscrizioni">
+          <div class="row mb-3">
+            <div class="col-md-10">
+              <label class="form-label">Seleziona evento dalla lista completa</label>
+              <select name="id_evento" class="form-select" onchange="this.form.submit()">
+                <option value="">-- Seleziona evento --</option>
+                <% if (eventi && eventi.length > 0) { %>
+                  <% eventi.forEach(e => { %>
+                    <option value="<%= e.id_evento %>" 
+                            <%= e.id_evento == eventoSelezionato?.id_evento ? 'selected' : '' %>>
+                      <%= e.titolo %> - <%= e.data_inizio ? new Date(e.data_inizio).toLocaleDateString('it-IT') : 'N/A' %>
+                      <% if (e.categoria_descrizione) { %> | <%= e.categoria_descrizione %><% } %>
+                    </option>
+                  <% }) %>
+                <% } %>
+              </select>
+            </div>
+            <div class="col-md-2 d-grid align-self-end">
+              <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle me-1"></i>Conferma
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- ✅ EVENTO SELEZIONATO -->
       <% if (eventoSelezionato) { %>
-        <div class="alert alert-info">
-          <strong>Evento selezionato:</strong> <%= eventoSelezionato.titolo %>
+        <div class="alert alert-success">
+          <div class="row">
+            <div class="col-md-8">
+              <h6 class="mb-1">
+                <i class="bi bi-calendar-check me-2"></i>Evento selezionato:
+              </h6>
+              <strong><%= eventoSelezionato.titolo %></strong>
+              <% if (eventoSelezionato.data_inizio) { %>
+                <br><small class="text-muted">
+                  Data: <%= new Date(eventoSelezionato.data_inizio).toLocaleDateString('it-IT') %>
+                  <% if (eventoSelezionato.luogo) { %> | Luogo: <%= eventoSelezionato.luogo %><% } %>
+                </small>
+              <% } %>
+            </div>
+            <div class="col-md-4 text-end">
+              <a href="/iscrizioni" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Cambia Evento
+              </a>
+              <a href="/iscrizioni/evento/<%= eventoSelezionato.id_evento %>/iscritti" class="btn btn-info btn-sm">
+                <i class="bi bi-people me-1"></i>Vedi Iscritti
+              </a>
+            </div>
+          </div>
         </div>
       <% } %>
     </div>
   </div>
 
+  <!-- ✅ RICERCA CLIENTE (rimane uguale) -->
   <% if (eventoSelezionato) { %>
     <div class="card shadow-sm">
       <div class="card-body">
@@ -86,7 +213,9 @@
 
           <div class="text-end">
             <input type="hidden" name="id_evento" value="<%= eventoSelezionato.id_evento %>">
-            <button type="submit" class="btn btn-primary">Ricerca</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-search me-1"></i>Ricerca Cliente
+            </button>
           </div>
         </form>
 
@@ -107,16 +236,18 @@
             <tbody>
               <% clienti.forEach(cliente => { %>
                 <tr>
-                  <td><%= cliente.nome %></td>
-                  <td><%= cliente.cognome_rag_soc %></td>
-                  <td><%= cliente.email %></td>
-                  <td><%= cliente.cellulare %></td>
-                  <td><%= cliente.cf_piva %></td>
+                  <td><%= cliente.nome || '-' %></td>
+                  <td><%= cliente.cognome_rag_soc || '-' %></td>
+                  <td><%= cliente.email || '-' %></td>
+                  <td><%= cliente.cellulare || '-' %></td>
+                  <td><%= cliente.cf_piva || '-' %></td>
                   <td>
                     <form method="POST" action="/iscrizioni">
                       <input type="hidden" name="id_cliente" value="<%= cliente.id_cliente %>">
                       <input type="hidden" name="id_evento" value="<%= eventoSelezionato.id_evento %>">
-                      <button type="submit" class="btn btn-sm btn-primary">Seleziona</button>
+                      <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="bi bi-person-check me-1"></i>Iscrivi
+                      </button>
                     </form>
                   </td>
                 </tr>
@@ -124,7 +255,10 @@
             </tbody>
           </table>
         <% } else if (clienti) { %>
-          <p class="text-muted mt-3">Nessun cliente trovato.</p>
+          <div class="alert alert-info mt-3">
+            <i class="bi bi-info-circle me-2"></i>
+            Nessun cliente trovato con i criteri specificati.
+          </div>
         <% } %>
       </div>
     </div>
